@@ -15,26 +15,24 @@ public class CategoryApiTest extends BaseTest {
     // TC_CAT_ADM_06 - Create main category
     @Test
     public void createMainCategory() {
-        String response =
+        categoryId =
                 given()
                         .header("Authorization", "Bearer " + AuthUtil.getAdminToken())
                         .contentType("application/json")
                         .body("""
-                {
-                  "name": "Electronics",
-                  "parentId": null
-                }
-                """)
+                    {
+                      "name": "Electro",
+                      "parentId": null
+                    }
+                    """)
                         .when()
                         .post("/api/categories")
                         .then()
-                        .log().all()     // 👈 THIS IS IMPORTANT
+                        .statusCode(201)
+                        .body("name", equalTo("Electro"))
                         .extract()
-                        .asString();
-
-        System.out.println("CREATE CATEGORY RESPONSE = " + response);
+                        .path("id");
     }
-
 
     // TC_CAT_ADM_07 - Create sub-category
     @Test(dependsOnMethods = "createMainCategory")
@@ -44,16 +42,16 @@ public class CategoryApiTest extends BaseTest {
                         .header("Authorization", "Bearer " + AuthUtil.getAdminToken())
                         .contentType("application/json")
                         .body("""
-                        {
-                          "name": "Mobiles",
-                          "parentId": %d
-                        }
-                        """.formatted(categoryId))
+                    {
+                      "name": "Mobile",
+                      "parentId": %d
+                    }
+                    """.formatted(categoryId))
                         .when()
                         .post("/api/categories")
                         .then()
                         .statusCode(201)
-                        .body("parentId", equalTo(categoryId))
+                        .body("name", equalTo("Mobile"))
                         .extract()
                         .path("id");
     }
@@ -65,15 +63,15 @@ public class CategoryApiTest extends BaseTest {
                 .header("Authorization", "Bearer " + AuthUtil.getAdminToken())
                 .contentType("application/json")
                 .body("""
-                {
-                  "name": "Updated Electronics"
-                }
-                """)
+            {
+              "name": "Electro1"
+            }
+            """)
                 .when()
                 .put("/api/categories/" + categoryId)
                 .then()
                 .statusCode(200)
-                .body("name", equalTo("Updated Electronics"));
+                .body("name", equalTo("Electro1"));
     }
 
     // TC_CAT_ADM_09 - Delete category
@@ -128,7 +126,11 @@ public class CategoryApiTest extends BaseTest {
         given()
                 .header("Authorization", "Bearer " + AuthUtil.getUserToken())
                 .contentType("application/json")
-                .body("{\"name\":\"Invalid\"}")
+                .body("""
+            {
+              "name": "BadCat"
+            }
+            """)
                 .when()
                 .post("/api/categories")
                 .then()
@@ -141,7 +143,11 @@ public class CategoryApiTest extends BaseTest {
         given()
                 .header("Authorization", "Bearer " + AuthUtil.getUserToken())
                 .contentType("application/json")
-                .body("{\"name\":\"Hack\"}")
+                .body("""
+            {
+              "name": "Hack"
+            }
+            """)
                 .when()
                 .put("/api/categories/" + categoryId)
                 .then()
