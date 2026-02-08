@@ -164,4 +164,6 @@ public class CategoryApiTest extends BaseTest {
                 .then()
                 .statusCode(403);
     }
+
+    //tested branch created successfully
 }
