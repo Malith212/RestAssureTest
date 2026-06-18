@@ -165,5 +165,5 @@ public class CategoryApiTest extends BaseTest {
                 .statusCode(403);
     }
 
-    //tested branch created 123456
+    //tested branch created 12
 }
